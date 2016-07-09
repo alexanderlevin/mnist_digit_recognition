@@ -1,49 +1,18 @@
-var mousePressed = false,
-    lastX, lastY,
-    ctx;
+var ctx;
 
-function InitThis() {
-	console.log("InitThis");
-    ctx = document.getElementById('myCanvas').getContext('2d');
-    ctx.lineWidth = 30;
-    $('#myCanvas').mousedown(function(e) {
-        mousePressed = true;
-        Draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, false);
+function Init() {
+    var canvas = document.getElementById('myCanvas');
+    var signaturePad = new SignaturePad(canvas, {
+        minWidgth: 20,
+        maxWidth: 25
     });
-    $('#myCanvas').mousemove(function(e) {
-        if(mousePressed) {
-            Draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, true);
-        }
-    });
-
-	$('#myCanvas').mouseup(function(e) {
-        mousePressed = false;
-    });
-    $('#myCanvas').mouseleave(function(e) {
-        mousePressed = false;
-    });
+    ctx = canvas.getContext('2d');
 };
-
-function Draw(x, y, isDown) {
-	if(isDown) {
-		ctx.beginPath();
-		ctx.moveTo(lastX, lastY);
-		ctx.lineTo(x, y);
-		ctx.closePath();
-		ctx.stroke()
-
-
-	}
-	lastX = x;
-	lastY = y;
-
-}
 
 function sendClassifyRequest() {
     var data = ctx.getImageData(0, 0, 500, 500).data;
     var opacities = data.filter(function(element, idx) {
         return (idx % 4 === 3);
-
     });
 
     var opacitiesToSend = []
@@ -52,7 +21,6 @@ function sendClassifyRequest() {
     });
 
     $.ajax({
-
         url: '/classify',
         type: 'POST',
         data: JSON.stringify(opacitiesToSend),
