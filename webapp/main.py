@@ -15,18 +15,18 @@ app = Flask(__name__)
 # Set up the model
 # Copy pasted from training batch
 def weight_variable(shape):
-	initial = tf.truncated_normal(shape, stddev=0.1)
-	return tf.Variable(initial)
+    initial = tf.truncated_normal(shape, stddev=0.1)
+    return tf.Variable(initial)
 
 def bias_variable(shape):
-	initial = tf.constant(0.1, shape=shape)
-	return tf.Variable(initial)
+    initial = tf.constant(0.1, shape=shape)
+    return tf.Variable(initial)
 
 def conv2d(x, W):
   return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
 
 def max_pool_2x2(x):
-  return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
+    return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
                         strides=[1, 2, 2, 1], padding='SAME')
 
 sess = tf.Session()
@@ -70,27 +70,27 @@ saver.restore(sess, 'model.ckpt')
 
 @app.route("/")
 def index():
-	return send_file('index.html')
+    return send_file('index.html')
 
 @app.route("/js/<path:path>")
 def send_js(path):
-	return send_from_directory('js', path)
+    return send_from_directory('js', path)
 
 @app.route("/classify", methods=['POST'])
 def classify():
-	json_body = request.get_json()
-	image = np.array(json_body, dtype=np.float32) / 256
-	print image
+    json_body = request.get_json()
+    image = np.array(json_body, dtype=np.float32) / 256
+    print image
 
-	image = np.reshape(image, (500, 500))
-	#print type(image)
-	#image[:, :, None]
-	with tf.Session():
-		resized_image = tf.image.resize_images(
-			image[:, :, None], 28, 28).eval()[:, :, 0]
+    image = np.reshape(image, (500, 500))
+    #print type(image)
+    #image[:, :, None]
+    with tf.Session():
+        resized_image = tf.image.resize_images(
+            image[:, :, None], 28, 28).eval()[:, :, 0]
 
-	classification = y_conv.eval(session=sess,
-		feed_dict={x: np.reshape(resized_image, (1, 28 * 28)), keep_prob: 1.})[0]
-	print classification
-	print 'Classification: %s'%np.argmax(classification)
-	return jsonify(classification=np.argmax(classification))
+    classification = y_conv.eval(session=sess,
+        feed_dict={x: np.reshape(resized_image, (1, 28 * 28)), keep_prob: 1.})[0]
+    print classification
+    print 'Classification: %s'%np.argmax(classification)
+    return jsonify(classification=np.argmax(classification))
