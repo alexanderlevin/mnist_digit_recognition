@@ -1,6 +1,11 @@
+import argparse
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 
+parser = argparse.ArgumentParser(description="Batch arguments")
+parser.add_argument('--num-training-steps', type=int, dest='num_training_steps', default=2000)
+parser.add_argument('--mini-batch-size', type=int, dest='mini_batch_size', default=50)
+args = parser.parse_args()
 
 def weight_variable(shape):
     initial = tf.truncated_normal(shape, stddev=0.1)
@@ -60,8 +65,8 @@ def run():
     correct_prediction = tf.equal(tf.argmax(y_conv,1), tf.argmax(y_,1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
     sess.run(tf.initialize_all_variables())
-    for i in xrange(2000):
-        batch = mnist.train.next_batch(50)
+    for i in xrange(args.num_training_steps):
+        batch = mnist.train.next_batch(args.mini_batch_size)
         if i % 100 == 0:
             train_accuracy = accuracy.eval(
                 feed_dict={
