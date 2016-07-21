@@ -1,8 +1,8 @@
-var ctx;
+var ctx, signaturePad;
 
 function Init() {
     var canvas = document.getElementById('myCanvas');
-    var signaturePad = new SignaturePad(canvas, {
+    signaturePad = new SignaturePad(canvas, {
         minWidgth: 20,
         maxWidth: 25
     });
@@ -20,6 +20,8 @@ function sendClassifyRequest() {
         opacitiesToSend.push(e);
     });
 
+    debugger;
+
     $.ajax({
         url: '/classify',
         type: 'POST',
@@ -33,4 +35,9 @@ function sendClassifyRequest() {
         }
     });
 
+}
+
+function clearAll() {
+    signaturePad.clear();
+    $('#classificationResult').text('');
 }
