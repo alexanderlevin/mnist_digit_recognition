@@ -28,7 +28,7 @@ def run():
 
     mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 
-    x = tf.placeholder(tf.float32, shape=[None, 784])
+    x = tf.placeholder(tf.float32, shape=[None, 784], name="x")
     y_ = tf.placeholder(tf.float32, shape=[None, 10])
 
     x_image = tf.reshape(x, [-1, 28, 28, 1])
@@ -51,13 +51,13 @@ def run():
     h_pool2_flat = tf.reshape(h_pool2, [-1, 7*7*64])
     h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
-    keep_prob = tf.placeholder(tf.float32)
+    keep_prob = tf.placeholder(tf.float32, name="keep_prob")
     h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
 
     W_fc2 = weight_variable([1024, 10])
     b_fc2 = bias_variable([10])
 
-    y_conv = tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
+    y_conv = tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2, name="y_conv")
 
     cross_entropy = tf.reduce_mean(
         -tf.reduce_sum(y_ * tf.log(y_conv), reduction_indices=[1]))
