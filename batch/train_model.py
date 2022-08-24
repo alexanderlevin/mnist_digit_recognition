@@ -1,6 +1,8 @@
 import argparse
 import tensorflow as tf
 import tensorflow_datasets as tfds
+from model import build_model
+from model import SAVED_MODEL_PATH
 
 parser = argparse.ArgumentParser(description="Batch arguments")
 parser.add_argument('--num-epochs', type=int, dest='num_epochs', default=5)
@@ -34,22 +36,11 @@ def extract_and_preprocess_dataset(batch_size: int):
 def run():
     ds_train = extract_and_preprocess_dataset(args.batch_size)
 
-    model = tf.keras.Sequential(
-        [
-            tf.keras.layers.Resizing(28, 28),
-            tf.keras.layers.Conv2D(32, 5, padding="SAME"),
-            tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
-            tf.keras.layers.Conv2D(64, 5, padding="SAME"),
-            tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
-            tf.keras.layers.Reshape((7 * 7 * 64,)),
-            tf.keras.layers.Dense(1024),
-            tf.keras.layers.Dense(10)
-        ]
-    )
+    model = build_model(return_probabilities=True)
 
-    model.compile(optimizer="adam", loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True))
+    model.compile(optimizer="adam", loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False))
     model.fit(ds_train, epochs=args.num_epochs)
-    model.save("saved_models")
+    model.save(SAVED_MODEL_PATH)
 
 
 if __name__ == '__main__':
