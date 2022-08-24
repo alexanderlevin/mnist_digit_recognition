@@ -1,7 +1,11 @@
 # MNIST digit recognition demo
 
 Little webapp for demoing digit recognition using the convolutional neural network.
-Originally based on a Tensorflow tutorial, but has since been ported to Keras.
+You can train a simple convolutional neural network on the MNIST dataset, and then
+try out your model on hand-written input (through a webapp).
+
+The convolutional network was originally based on a 
+Tensorflow tutorial, but has since been ported to Keras.
 
 ## Set up your environment
 1. Create and activate a virtualenv
