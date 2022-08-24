@@ -3,7 +3,7 @@ var ctx, signaturePad;
 function Init() {
     var canvas = document.getElementById('myCanvas');
     signaturePad = new SignaturePad(canvas, {
-        minWidgth: 20,
+        minWidth: 20,
         maxWidth: 25
     });
     ctx = canvas.getContext('2d');
@@ -19,8 +19,6 @@ function sendClassifyRequest() {
     opacities.forEach(function(e) {
         opacitiesToSend.push(e);
     });
-
-    debugger;
 
     $.ajax({
         url: '/classify',
