@@ -23,13 +23,18 @@ function sendClassifyRequest() {
     $.ajax({
         url: '/classify',
         type: 'POST',
-        data: JSON.stringify(opacitiesToSend),
+        data: JSON.stringify(
+             {
+                 imageData: opacitiesToSend,
+                 returnAllProbabilities: true
+             }
+        ),
         contentType:"application/json; charset=utf-8",
         dataType: 'json',
         processData: false,
         success: function(response) {
-            $('#classificationResult').text(
-                response.classification);
+            $('#classificationResult').text(response.classification);
+            $('#classProbabilities').text(response.probabilities.map((x) => x.toFixed(3)));
         }
     });
 
@@ -38,4 +43,5 @@ function sendClassifyRequest() {
 function clearAll() {
     signaturePad.clear();
     $('#classificationResult').text('');
+    $('#classProbabilities').text('');
 }

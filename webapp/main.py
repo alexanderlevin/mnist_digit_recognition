@@ -24,7 +24,7 @@ def send_js(path):
 @app.route("/classify", methods=['POST'])
 def classify():
     json_body = request.get_json()
-    image = np.array(json_body, dtype=np.float32) / 255
+    image = np.array(json_body['imageData'], dtype=np.float32) / 255
     print(image)
 
     image = tf.image.resize(
@@ -32,7 +32,12 @@ def classify():
         (28, 28)
     )
 
-    classification = model(image)
+    classification = model(image)[0]
     print(classification)
     print('Classification: {}'.format(np.argmax(classification)))
-    return jsonify(classification=int(np.argmax(classification)))
+    response = {
+        "classification": int(np.argmax(classification))
+    }
+    if json_body["returnAllProbabilities"]:
+        response["probabilities"] = np.array(classification).tolist()
+    return jsonify(**response)
