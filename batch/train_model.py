@@ -25,21 +25,33 @@ def extract_and_preprocess_dataset(batch_size: int):
 
     ds_train = ds_train.map(
         normalize_img, num_parallel_calls=tf.data.AUTOTUNE
+    ).cache(
+    ).shuffle(
+        ds_info.splits["train"].num_examples
+    ).batch(
+        batch_size
+    ).prefetch(
+        tf.data.AUTOTUNE
     )
-    ds_train = ds_train.cache()
-    ds_train = ds_train.shuffle(ds_info.splits["train"].num_examples)
-    ds_train = ds_train.batch(batch_size)
-    ds_train = ds_train.prefetch(tf.data.AUTOTUNE)
-    return ds_train
+
+    ds_test = ds_test.map(
+        normalize_img, num_parallel_calls=tf.data.AUTOTUNE
+    ).batch(batch_size)
+
+    return ds_train, ds_test
 
 
 def run():
-    ds_train = extract_and_preprocess_dataset(args.batch_size)
+    ds_train, ds_test = extract_and_preprocess_dataset(args.batch_size)
 
     model = build_model(return_probabilities=True)
 
-    model.compile(optimizer="adam", loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False))
-    model.fit(ds_train, epochs=args.num_epochs)
+    model.compile(
+        optimizer="adam",
+        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
+        metrics="sparse_categorical_accuracy"
+    )
+    model.fit(ds_train, epochs=args.num_epochs, validation_data=ds_test)
     model.save(SAVED_MODEL_PATH)
 
 
