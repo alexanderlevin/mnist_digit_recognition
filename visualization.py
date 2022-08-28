@@ -28,14 +28,13 @@ def find_image_to_visualize(model, dataset, desired_class, probability_threshold
         lambda _, label: label == desired_class
     ).map(
         lambda image, _: tf.cast(image, tf.float32) / 255.
-    ).shuffle(
-        1024
     ).batch(128)
 
     dataset_and_predictions = tf.data.Dataset.zip(
         (filtered_dataset.flat_map(tf.data.Dataset.from_tensor_slices),
          tf.data.Dataset.from_tensor_slices(model.predict(filtered_dataset)))
-    )
+    ).shuffle(1024)
+
     return dataset_and_predictions.filter(
         lambda image, predictions: predictions[desired_class] < probability_threshold
     ).as_numpy_iterator().next()
