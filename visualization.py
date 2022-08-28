@@ -3,6 +3,7 @@ from matplotlib import pyplot as plt
 import seaborn as sns
 import numpy as np
 import tensorflow_datasets as tfds
+import tensorflow as tf
 
 
 def find_image_to_visualize(model, dataset, desired_class, probability_threshold=0.9):
@@ -15,7 +16,7 @@ def find_image_to_visualize(model, dataset, desired_class, probability_threshold
        interesting gradients
 
     :param model: The keras digit classification model
-    :param dataset: The dataset
+    :param dataset: The dataset (un-batched)
     :param desired_class: We return an image in this class
     :param probability_threshold: The probability of the image being in `desired_class`, according to the `model`,
         must be below this threshold
@@ -23,12 +24,21 @@ def find_image_to_visualize(model, dataset, desired_class, probability_threshold
        The return value is of dimension (1, 28, 28, 1); the first dimension is the batch dimension, and the last
        dimension is the channel dimension.
     """
-    for image, label in tfds.as_numpy(dataset.shuffle(1024)):
-        if label == desired_class:
-            X = (image / 255)[None, :, :, :]
-            if model(X)[0][desired_class] < probability_threshold:
-                print(model(X)[0][desired_class])
-                return X
+    filtered_dataset = dataset.filter(
+        lambda _, label: label == desired_class
+    ).map(
+        lambda image, _: tf.cast(image, tf.float32) / 255.
+    ).shuffle(
+        1024
+    ).batch(128)
+
+    dataset_and_predictions = tf.data.Dataset.zip(
+        (filtered_dataset.flat_map(tf.data.Dataset.from_tensor_slices),
+         tf.data.Dataset.from_tensor_slices(model.predict(filtered_dataset)))
+    )
+    return dataset_and_predictions.filter(
+        lambda image, predictions: predictions[desired_class] < probability_threshold
+    ).as_numpy_iterator().next()
 
 
 def visualize_gradients(model, image, classes_to_visualize, figure_height):
