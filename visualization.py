@@ -14,6 +14,11 @@ def find_image_to_visualize(model, dataset, desired_class, probability_threshold
        model is at least somewhat uncertain about the class, which, in our experience, leads to more
        interesting gradients
 
+    Example:
+       >>> _, ds_test = extract_and_preprocess_dataset(128)
+       >>> ds_test = ds_test.unbatch()
+       >>> image, probabilities = find_image_to_visualize(model, ds_test, desired_class=1)
+
     :param model: The keras digit classification model
     :param dataset: The dataset (un-batched), consisting of images (normalized such that pixel values are between 0
         and 1) and labels
@@ -21,13 +26,12 @@ def find_image_to_visualize(model, dataset, desired_class, probability_threshold
     :param probability_threshold: The probability of the image being in `desired_class`, according to the `model`,
         must be below this threshold
     :return: The image with the required properties, in normalized form (entries between 0 and 1).
-       The return value is of dimension (1, 28, 28, 1); the first dimension is the batch dimension, and the last
-       dimension is the channel dimension.
+       The return value is of dimension (28, 28, 1); the last dimension is the channel dimension.
     """
     filtered_dataset = dataset.filter(
         lambda _, label: label == desired_class
     ).map(
-        lambda image, _: tf.cast(image, tf.float32) / 255.
+        lambda image, _: image
     ).batch(128)
 
     dataset_and_predictions = tf.data.Dataset.zip(
