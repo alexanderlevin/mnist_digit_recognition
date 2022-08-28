@@ -2,7 +2,6 @@ from model import compute_gradients
 from matplotlib import pyplot as plt
 import seaborn as sns
 import numpy as np
-import tensorflow_datasets as tfds
 import tensorflow as tf
 
 
@@ -16,7 +15,8 @@ def find_image_to_visualize(model, dataset, desired_class, probability_threshold
        interesting gradients
 
     :param model: The keras digit classification model
-    :param dataset: The dataset (un-batched)
+    :param dataset: The dataset (un-batched), consisting of images (normalized such that pixel values are between 0
+        and 1) and labels
     :param desired_class: We return an image in this class
     :param probability_threshold: The probability of the image being in `desired_class`, according to the `model`,
         must be below this threshold
@@ -31,7 +31,7 @@ def find_image_to_visualize(model, dataset, desired_class, probability_threshold
     ).batch(128)
 
     dataset_and_predictions = tf.data.Dataset.zip(
-        (filtered_dataset.flat_map(tf.data.Dataset.from_tensor_slices),
+        (filtered_dataset.unbatch(),
          tf.data.Dataset.from_tensor_slices(model.predict(filtered_dataset)))
     ).shuffle(1024)
 
@@ -45,7 +45,7 @@ def visualize_gradients(model, image, classes_to_visualize, figure_height):
 
     :param model: The keras model
     :param image: The input image; an array of rank 2, 3, or 4.  If the rank is less than 4, the batch dimension and/or
-        the channel dimension are added as needed
+        the channel dimension are added as needed.  The image must be normalized, with pixel values between 0 and 1
     :param classes_to_visualize: Classes whose probability gradients we will analyze.  We assume this is
         an array of size 2
     :param figure_height: Height of the figure we display
