@@ -15,13 +15,13 @@ def build_model(return_probabilities=False):
     model = tf.keras.Sequential(
         [
             tf.keras.layers.Resizing(28, 28),
-            tf.keras.layers.Conv2D(32, 5, padding="SAME"),
+            tf.keras.layers.Conv2D(32, 5, padding="SAME", activation="relu"),
             tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
-            tf.keras.layers.Conv2D(64, 5, padding="SAME"),
+            tf.keras.layers.Conv2D(64, 5, padding="SAME", activation="relu"),
             tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
             tf.keras.layers.Reshape((7 * 7 * 64,)),
-            tf.keras.layers.Dense(1024),
-            tf.keras.layers.Dense(10)
+            tf.keras.layers.Dense(1024, activation="relu"),
+            tf.keras.layers.Dense(10, activation=None)
         ]
     )
 
