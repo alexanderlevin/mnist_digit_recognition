@@ -36,9 +36,11 @@ def compute_gradients(model, input_image):
 
     :param model: Keras model
     :param input_image: Input image, represented as an array of shape (1, 28, 28, 1)
-    :return: The gradients, a tensor of shape (1, 10, 28, 28, 1)
+    :return: The gradients, a tensor of shape (1, 10, 28, 28, 1).  If J is the output,
+       then J[0, class, :, :, 0] is the gradient of the predicted probability of `class`
+       with respect to the pixel values of the input image.
     """
-    input_tensor = tf.constant(input_image)
+    input_tensor = tf.convert_to_tensor(input_image)
     with tf.GradientTape() as tape:
         tape.watch(input_tensor)
         probabilities = model(input_tensor)
