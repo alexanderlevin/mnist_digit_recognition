@@ -74,3 +74,22 @@ def visualize_gradients(model, image, classes_to_visualize, figure_height):
     sns.heatmap(jacobian[0, classes_to_visualize[0], :, :, 0], vmin=min_gradient, vmax=max_gradient, ax=ax[1])
     sns.heatmap(jacobian[0, classes_to_visualize[1], :, :, 0], vmin=min_gradient, vmax=max_gradient, ax=ax[2])
 
+
+def find_image_optimizing_class_probability(model, initial_image, target_class, n_iterations, learning_rate):
+    """Optimize an output class by gradient ascent
+
+    Starting with an initial image, perform gradient ascent to maximize a model's output for a given class.
+    :param model: The keras model
+    :param initial_image: Initial image, of dimensions (1, 28, 28, 1)
+    :param target_class: Class whose probability (or other model output) you want to optimize
+    :param n_iterations: Total number of iterations
+    :param learning_rate: Learning rate
+    :return: The final image
+    """
+    current_image = initial_image
+    for _ in range(n_iterations):
+        gradients = compute_gradients(model, current_image)[:, target_class, :, :, :]
+        current_image += learning_rate * gradients
+        current_image = tf.clip_by_value(current_image, 0, 1)
+
+    return np.array(current_image)
