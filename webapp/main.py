@@ -7,6 +7,7 @@ from flask import jsonify
 import tensorflow as tf
 import numpy as np
 
+from model import compute_gradients
 from model import SAVED_MODEL_PATH
 
 app = Flask(__name__)
@@ -43,4 +44,11 @@ def classify():
     }
     if json_body["returnAllProbabilities"]:
         response["probabilities"] = np.array(classification).tolist()
+    if json_body["computeGradients"]:
+        jacobian = np.array(compute_gradients(model, input_image=image)).astype(float)
+        # Return the gradients as a dictionary of class to 28 x 28 matrix of gradients
+        # Prior to returning, we need to convert the 2D numpy array into a nested list
+        response["gradients"] = {
+            i: list(map(list, jacobian[0, i, :, :, 0])) for i in range(10)
+        }
     return jsonify(**response)

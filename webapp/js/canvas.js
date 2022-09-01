@@ -24,7 +24,8 @@ function sendClassifyRequest() {
         data: JSON.stringify(
              {
                  imageData: opacitiesToSend,
-                 returnAllProbabilities: true
+                 returnAllProbabilities: true,
+                 computeGradients: true
              }
         ),
         contentType:"application/json; charset=utf-8",
@@ -33,6 +34,22 @@ function sendClassifyRequest() {
         success: function(response) {
             $('#classificationResult').text(response.classification);
             $('#classProbabilities').text(response.probabilities.map((x) => x.toFixed(3)));
+            var gradientData = [{
+              z: response.gradients[response.classification],
+              type: 'heatmap'
+            }];
+            Plotly.newPlot(
+                'gradientHeatmap',
+                gradientData,
+                {
+                  title: 'Gradients of p(' + response.classification + ')',
+                  width: 700,
+                  height: 700,
+                  yaxis: {
+                    autorange: 'reversed',
+                  }
+                }
+            );
         }
     });
 
@@ -42,4 +59,5 @@ function clearAll() {
     signaturePad.clear();
     $('#classificationResult').text('');
     $('#classProbabilities').text('');
+    $('#gradientHeatmap').empty();
 }
