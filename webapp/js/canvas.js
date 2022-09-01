@@ -15,10 +15,8 @@ function sendClassifyRequest() {
         return (idx % 4 === 3);
     });
 
-    var opacitiesToSend = []
-    opacities.forEach(function(e) {
-        opacitiesToSend.push(e);
-    });
+    // opacities is a Uint8ClampedArray, which gets weirdly JSON serialized
+    var opacitiesToSend = Array.from(opacities)
 
     $.ajax({
         url: '/classify',
