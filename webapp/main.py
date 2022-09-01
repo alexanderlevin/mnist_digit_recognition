@@ -7,9 +7,12 @@ from flask import jsonify
 import tensorflow as tf
 import numpy as np
 
+from model import SAVED_MODEL_PATH
+
 app = Flask(__name__)
 
-model = tf.keras.models.load_model("saved_models")
+model = tf.keras.models.load_model(SAVED_MODEL_PATH)
+
 
 @app.route("/")
 def index():

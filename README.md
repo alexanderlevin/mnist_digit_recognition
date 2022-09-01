@@ -21,8 +21,10 @@ python -m batch.train_model --num-epochs 5
 
 ## Start up a local dev server for the webapp
 ```
-flask --app webapp/main run
+python -m flask --app webapp/main run
 ``` 
+
+You can also add the `--debug` flag to run in debugging mode. 
 
 This webapp vendors in the Signature Pad javascript library (https://github.com/szimek/signature_pad).
 Signature Pad is released under the MIT License.
