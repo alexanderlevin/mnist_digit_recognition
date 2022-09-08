@@ -19,7 +19,7 @@ def build_model(return_probabilities=False):
             tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
             tf.keras.layers.Conv2D(64, 5, padding="SAME", activation="relu"),
             tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
-            tf.keras.layers.Reshape((7 * 7 * 64,)),
+            tf.keras.layers.Flatten(),
             tf.keras.layers.Dense(1024, activation="relu"),
             tf.keras.layers.Dense(10, activation=None)
         ]
