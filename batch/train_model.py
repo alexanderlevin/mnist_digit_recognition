@@ -1,4 +1,7 @@
 import argparse
+import os
+from datetime import datetime
+
 from datasets import extract_and_preprocess_dataset
 import tensorflow as tf
 from model import build_model
@@ -11,6 +14,9 @@ args = parser.parse_args()
 
 
 def run():
+    now = datetime.now()
+    model_save_path = os.path.join(SAVED_MODEL_PATH, now.strftime("%Y%m%d-%H%M"))
+
     ds_train, ds_test = extract_and_preprocess_dataset(args.batch_size)
 
     model = build_model(return_probabilities=True)
@@ -21,7 +27,7 @@ def run():
         metrics="sparse_categorical_accuracy"
     )
     model.fit(ds_train, epochs=args.num_epochs, validation_data=ds_test)
-    model.save(SAVED_MODEL_PATH)
+    model.save(model_save_path)
 
 
 if __name__ == '__main__':
